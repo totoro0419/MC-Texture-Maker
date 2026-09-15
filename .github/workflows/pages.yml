@@ -22,8 +22,8 @@ jobs:
         run: |
           mkdir -p src
           base64 -d ui-source/index.html.gz.b64 | gzip -d > index.html
-          base64 -d ui-source/styles.css.gz.b64 | gzip -d > styles.css
-          base64 -d ui-source/app.js.gz.b64 | gzip -d > src/app.js
+          sed 's/=$//' ui-source/styles.css.gz.b64 | base64 -d | gzip -d > styles.css
+          (cat ui-source/app.js.gz.b64; printf '=') | base64 -d | gzip -d > src/app.js
       - name: Mandatory UI skill gate
         run: |
           node --input-type=module <<'NODE'
