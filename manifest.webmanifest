@@ -1,0 +1,15 @@
+{
+  "name": "MC Texture Maker",
+  "short_name": "MC Texture",
+  "description": "Minecraft Java 1.8.9 resource-pack studio for textures, animation, 3D models and OptiFine sky.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080d14",
+  "theme_color": "#0b1019",
+  "icons": [
+    {"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"},
+    {"src":"./icons/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}
+  ]
+}
