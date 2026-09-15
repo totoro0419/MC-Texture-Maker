@@ -1,0 +1,11 @@
+{
+  "requiredSkill": "ui-implementation-quality",
+  "requiredVersion": "v0.2",
+  "skillSource": "ChatGPT Library: ui-implementation-skill-v0.2.zip",
+  "applied": false,
+  "reviewPipeline": "UNVERIFIED",
+  "runtimeQA": "UNVERIFIED",
+  "regression": "UNVERIFIED",
+  "completionAllowed": false,
+  "note": "This project must not be called complete or deployed as complete until the required UI Implementation Quality Skill v0.2 has been applied and its review, runtime QA, and regression gates have evidence-backed PASS results. Similar or substitute skills do not satisfy this gate."
+}
