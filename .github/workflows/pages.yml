@@ -57,19 +57,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: github-pages
-          path: artifact
-      - name: Restore Pages artifact shape
-        run: |
-          mkdir site
-          tar -xf artifact/artifact.tar -C site
       - uses: actions/configure-pages@v5
-      - name: Upload final Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
