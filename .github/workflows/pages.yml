@@ -18,6 +18,26 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Mandatory UI skill gate
+        run: |
+          node --input-type=module <<'EOF'
+          import fs from 'node:fs';
+          const gate = JSON.parse(fs.readFileSync('quality/ui-skill-gate.json', 'utf8'));
+          const failures = [];
+          if (gate.requiredSkill !== 'ui-implementation-quality') failures.push('wrong required skill');
+          if (gate.requiredVersion !== 'v0.2') failures.push('wrong required version');
+          if (gate.applied !== true) failures.push('required skill not applied');
+          if (gate.reviewPipeline !== 'PASS') failures.push('review pipeline not PASS');
+          if (gate.runtimeQA !== 'PASS') failures.push('runtime QA not PASS');
+          if (gate.regression !== 'PASS') failures.push('regression not PASS');
+          if (gate.completionAllowed !== true) failures.push('completion not allowed');
+          if (failures.length) {
+            console.error('UI SKILL GATE FAILED:');
+            for (const failure of failures) console.error(`- ${failure}`);
+            process.exit(1);
+          }
+          console.log('UI SKILL GATE PASS');
+          EOF
       - name: Syntax and core tests
         run: |
           for f in src/*.js src/editors/*.js sw.js; do node --check "$f"; done
