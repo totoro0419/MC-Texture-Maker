@@ -1,23 +1,16 @@
 # MC Texture Maker
 
-A browser-based PWA for building **Minecraft Java Edition 1.8.9** resource packs, including the 1.8.9-era OptiFine/MCPatcher layout.
+Browser/PWA editor for **Minecraft Java Edition 1.8.9** resource packs, including OptiFine/MCPatcher-era assets.
 
-## Implemented
+## Core workflows
 
-- ZIP import with preservation of unknown files and path traversal rejection
-- Minecraft-ready ZIP export
-- IndexedDB autosave and reload recovery
-- Generic PNG editing for every PNG in a pack
-- Non-resampling Resolution Grid editing (16/32/64/128/256/512/1024 when divisible)
-- Pencil, eraser, fill, eyedropper, undo/redo
-- Vanilla animation metadata studio (`.png.mcmeta`)
-- 1.8.9 JSON model studio with cuboid editor and isometric preview
-- OptiFine/MCPatcher Sky Studio
-- CTM and CIT properties builders
-- Raw JSON / `.mcmeta` / `.properties` editor
-- Live validation for `pack.mcmeta`, JSON syntax, case collisions, sky references, animation metadata
-- Offline-installable PWA shell
-- Responsive desktop/tablet/mobile UI
+- Create a new 1.8.9 pack from a **Vanilla 1.8.9 baseline** or as a blank pack.
+- One-time vanilla setup reads textures from the user's own local `1.8.9.jar`, caches them in IndexedDB, and makes them available in every vanilla-based project.
+- Untouched vanilla files remain a read-only baseline; only edited overrides are stored/exported, so generated packs do not duplicate the entire vanilla asset set.
+- Open existing resource-pack ZIPs, preserve unknown files, validate, edit, autosave, and export a Minecraft-ready ZIP.
+- Generic PNG editing with non-resampling logical grids, undo/redo, pencil, eraser, fill, and eyedropper.
+- Animation metadata, 1.8.9 model JSON, OptiFine sky, CTM/CIT helpers, and raw JSON/properties editing.
+- Offline-capable PWA with responsive desktop/mobile UI.
 
 ## Compatibility target
 
@@ -25,16 +18,14 @@ A browser-based PWA for building **Minecraft Java Edition 1.8.9** resource packs
 - `pack_format: 1`
 - OptiFine 1.8.9 HD U M5 / `assets/minecraft/mcpatcher/...`
 
-## Run locally
+## Vanilla asset handling
 
-No build step is required.
+Minecraft's vanilla assets are not committed to this repository. On first use, choose the local client JAR from `.minecraft/versions/1.8.9/1.8.9.jar`. The app extracts only `assets/minecraft/textures/**` PNGs and animation metadata into local browser storage. Later projects can use that cached baseline immediately.
+
+## Run locally
 
 ```bash
 python3 -m http.server 4173
 ```
 
 Then open `http://localhost:4173`.
-
-## Notes
-
-Export uses standards-compliant **stored ZIP entries** rather than recompressing PNG/OGG payloads. This trades some archive-level compression for dependency-free, offline-capable ZIP generation in the browser.
