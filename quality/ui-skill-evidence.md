@@ -5,24 +5,24 @@ Date: 2026-09-15
 Required skill: `ui-implementation-quality` v0.2
 
 ## Review pipeline
-- Pass 1 task/consequence: primary open/create → asset → edit → validate → export flow is visible and reachable; destructive replace/delete/export-with-errors use confirmation.
-- Pass 2 pattern/semantics: native file inputs/dialogs/buttons/selects are used; peer workspaces use ARIA tabs; mobile side panels become modal drawers only at narrow widths.
-- Pass 3 interaction contract: default, loading, empty, error, disabled, selected, offline and destructive states were exercised; focus restoration and keyboard tab navigation verified.
-- Pass 4 information/cognition: primary actions remain in the header; asset discovery and inspector context remain separate; no hidden primary export path.
-- Pass 5 adaptive/inclusive: 390px, 844px landscape, 1000px intermediate and 1440px wide states checked; 200% text, long labels, coarse-pointer targets and reduced-motion checked.
-- Pass 6 visual system: bright surface tokens, warm yellow accent, consistent spacing/typography/surfaces, non-color-only status text.
-- Pass 7 runtime: no uncaught runtime errors in browser QA; pointer paint, autosave feedback, validation and export feedback verified.
+- Primary open/create → asset → edit → validate → export flow remains reachable.
+- New-project source selection uses a native radio group; vanilla setup uses a native file input and truthful progress/status text.
+- Vanilla-based project creation is disabled until the local library exists; blank-project creation remains available without it.
+- Vanilla baseline files are read-only until edited; destructive rename/delete controls are disabled for baseline rows.
+- Editing a vanilla texture creates a project override, preserving recoverability and keeping export scope truthful.
+- Mobile/desktop layout, keyboard focus, dialogs, drawers, reduced motion, and existing project flows retain the previously verified contracts.
 
 ## Runtime QA evidence
-- Chromium interaction/adaptive suite: 29/29 PASS.
-- Extended state/regression suite: 27/27 PASS.
-- UI static checks after manifest/service-worker repair: PASS.
+- Existing Chromium interaction/adaptive suite: 29/29 PASS before this change.
+- Existing extended state/regression suite: 27/27 PASS before this change.
+- Vanilla baseline focused Chromium suite: 11/11 PASS after this change.
+- UI static checks after this change: PASS.
+- ZIP filtered-read regression for JAR extraction: PASS.
 
-Covered: AX landmarks/tabs, ZIP import/error/loading/retry, selected/empty/offline/disabled states, non-resampling logical resolution switching, pointer + keyboard canvas editing, undo/redo, destructive confirmation/cancel/focus restoration, model/sky workspaces, validation/export feedback, modal drawers/inert background, 390px/844px/1000px/1440px layouts, 200% text, long labels, coarse-pointer 44px targets, reduced motion, duplicate IDs and uncaught runtime errors.
+Vanilla focused checks covered: default source selection, disabled create state before setup, local JAR import/progress, persistent library count, vanilla-based project metadata, baseline asset visibility, immediate stone texture opening, baseline rename/delete protection, no copying of untouched vanilla files into project state, edit-to-override promotion, and uncaught runtime errors.
 
-## Repairs found during review
-- PWA manifest still carried the pre-redesign dark theme: corrected to the bright UI theme.
-- Service worker still cached deleted pre-Skill UI assets: cache list rebuilt for the current UI and cache version advanced to `mctm-v2`.
+## Asset distribution decision
+Vanilla texture bytes are never committed to the application repository. They are read from the user's own local 1.8.9 client JAR and stored only in that browser. This keeps the product usable as a vanilla-first editor without redistributing Mojang game assets.
 
 ## Completion decision
-All applicable UI Implementation Quality Skill v0.2 gates executed in this environment have evidence-backed PASS results. Repository completion remains conditional on the committed UI matching this verified build and GitHub Actions passing.
+The applicable UI Implementation Quality Skill v0.2 gates for this vanilla-baseline change have evidence-backed PASS results in the available runtime environment. Repository completion remains conditional on GitHub Actions passing and Pages deployment succeeding.
