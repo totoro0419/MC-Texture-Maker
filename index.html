@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fff7d6">
+  <meta name="color-scheme" content="light">
+  <title>MC Texture Maker</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#editor-main">Skip to editor</a>
+
+  <div id="app" class="app-shell" data-project="empty">
+    <header class="topbar" aria-label="Application header">
+      <div class="brand-block">
+        <div class="brand-mark" aria-hidden="true">
+          <span class="brand-pixel p1"></span><span class="brand-pixel p2"></span><span class="brand-pixel p3"></span>
+        </div>
+        <div class="brand-copy">
+          <strong>MC Texture Maker</strong>
+          <span>Java 1.8.9 · OptiFine M5</span>
+        </div>
+      </div>
+
+      <div class="project-chip" id="project-chip" aria-live="polite">
+        <span class="project-dot" aria-hidden="true"></span>
+        <span id="project-name">No project</span>
+      </div>
+
+      <div class="topbar-actions" aria-label="Project actions">
+        <button class="button subtle mobile-only" id="open-assets-drawer" type="button" aria-controls="assets-panel" aria-expanded="false">Assets</button>
+        <label class="button subtle file-button" for="pack-file-input">Open ZIP</label>
+        <input id="pack-file-input" class="visually-hidden" type="file" accept=".zip,application/zip">
+        <button class="button subtle" id="new-project-button" type="button">New</button>
+        <button class="button subtle" id="validate-button" type="button" disabled>Validate</button>
+        <button class="button primary" id="export-button" type="button" disabled>Export ZIP</button>
+      </div>
+    </header>
+
+    <div class="status-ribbon" id="status-ribbon" role="status" aria-live="polite">
+      <div class="status-copy">
+        <span class="status-icon" id="network-icon" aria-hidden="true">●</span>
+        <span id="network-status">Local-first editor</span>
+      </div>
+      <div class="save-state" id="save-state" data-state="idle">
+        <span class="save-dot" aria-hidden="true"></span>
+        <span id="save-label">Nothing to save</span>
+      </div>
+    </div>
+
+    <nav class="workspace-nav" aria-label="Editor workspaces">
+      <div class="workspace-tabs" role="tablist" aria-label="Editor workspace">
+        <button class="workspace-tab" id="tab-texture" role="tab" aria-selected="true" aria-controls="panel-texture" tabindex="0" data-workspace="texture" type="button">
+          <span class="tab-icon" aria-hidden="true">▦</span><span>Texture</span>
+        </button>
+        <button class="workspace-tab" id="tab-animation" role="tab" aria-selected="false" aria-controls="panel-animation" tabindex="-1" data-workspace="animation" type="button">
+          <span class="tab-icon" aria-hidden="true">▶</span><span>Animate</span>
+        </button>
+        <button class="workspace-tab" id="tab-model" role="tab" aria-selected="false" aria-controls="panel-model" tabindex="-1" data-workspace="model" type="button">
+          <span class="tab-icon" aria-hidden="true">◇</span><span>3D</span>
+        </button>
+        <button class="workspace-tab" id="tab-sky" role="tab" aria-selected="false" aria-controls="panel-sky" tabindex="-1" data-workspace="sky" type="button">
+          <span class="tab-icon" aria-hidden="true">☀</span><span>Sky</span>
+        </button>
+        <button class="workspace-tab" id="tab-advanced" role="tab" aria-selected="false" aria-controls="panel-advanced" tabindex="-1" data-workspace="advanced" type="button">
+          <span class="tab-icon" aria-hidden="true">{ }</span><span>Advanced</span>
+        </button>
+      </div>
+      <div class="workspace-meta">
+        <button class="icon-button mobile-only" id="open-inspector-drawer" type="button" aria-label="Open inspector" aria-controls="inspector-panel" aria-expanded="false">ⓘ</button>
+        <button class="problems-button" id="problems-button" type="button" aria-controls="problems-panel" aria-expanded="false">
+          <span>Problems</span><span class="count-badge" id="problem-count">0</span>
+        </button>
+      </div>
+    </nav>
+
+    <main class="workspace-shell" id="editor-main">
+      <aside class="side-panel assets-panel" id="assets-panel" aria-label="Assets">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Project</p>
+            <h2>Assets</h2>
+          </div>
+          <button class="icon-button panel-close mobile-only" id="close-assets-drawer" type="button" aria-label="Close assets">×</button>
+        </div>
+
+        <div class="asset-tools">
+          <label class="search-field" for="asset-search">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input id="asset-search" type="search" placeholder="Search files" autocomplete="off" disabled>
+          </label>
+          <label class="field compact-field" for="asset-filter">
+            <span>Type</span>
+            <select id="asset-filter" disabled>
+              <option value="All">All assets</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="asset-summary" id="asset-summary" aria-live="polite">
+          <span>0 files</span><span>0 textures</span>
+        </div>
+
+        <div class="asset-list" id="asset-list">
+          <div class="empty-mini">
+            <div class="empty-mini-icon" aria-hidden="true">□</div>
+            <strong>No pack open</strong>
+            <span>Open a ZIP or create a project.</span>
+          </div>
+        </div>
+
+        <div class="asset-panel-footer">
+          <label class="button subtle full-width file-button disabled" id="png-import-label" for="png-file-input" aria-disabled="true">Add PNG</label>
+          <input id="png-file-input" class="visually-hidden" type="file" accept="image/png" disabled>
+        </div>
+      </aside>
+
+      <section class="editor-column" aria-label="Editor">
+        <section class="empty-state" id="project-empty-state">
+          <div class="empty-hero-art" aria-hidden="true">
+            <div class="cube-face face-top"></div>
+            <div class="cube-face face-left"></div>
+            <div class="cube-face face-right"></div>
+            <span class="spark spark-a">✦</span><span class="spark spark-b">✦</span>
+          </div>
+          <p class="eyebrow">Minecraft Java 1.8.9</p>
+          <h1>Build a resource pack without fighting the file structure.</h1>
+          <p>Open an existing ZIP or start a clean pack. Unknown files are preserved while supported assets get visual editors.</p>
+          <p class="upload-note">ZIP resource packs only · drop a .zip here or use Open ZIP · processed locally</p>
+          <div class="empty-actions">
+            <label class="button primary file-button" for="pack-file-input">Open resource pack</label>
+            <button class="button secondary" id="new-project-hero" type="button">Create new pack</button>
+          </div>
+          <div class="feature-strip" aria-label="Supported workflows">
+            <span>Pixel editing</span><span>Animation</span><span>3D models</span><span>OptiFine sky</span><span>Validation</span>
+          </div>
+        </section>
+
+        <section class="editor-surface hidden" id="project-editor-surface">
+          <div class="asset-context-bar">
+            <div class="asset-context-text">
+              <p class="eyebrow" id="asset-kind">Asset</p>
+              <h1 id="asset-title">Choose an asset</h1>
+              <p id="asset-path">Select a file from Assets to begin.</p>
+            </div>
+            <div class="context-actions">
+              <button class="button subtle" id="rename-button" type="button" disabled>Rename</button>
+              <button class="button subtle danger-text" id="delete-button" type="button" disabled>Delete</button>
+            </div>
+          </div>
+
+          <div class="workspace-panel" id="panel-texture" role="tabpanel" aria-labelledby="tab-texture" data-panel="texture">
+            <div class="editor-toolbar" aria-label="Texture tools">
+              <div class="tool-group" aria-label="Drawing tools">
+                <button class="tool-button is-selected" type="button" data-tool="pencil" aria-pressed="true" title="Pencil (B)"><span aria-hidden="true">✎</span><span>Pencil</span></button>
+                <button class="tool-button" type="button" data-tool="eraser" aria-pressed="false" title="Eraser (E)"><span aria-hidden="true">◇</span><span>Eraser</span></button>
+                <button class="tool-button" type="button" data-tool="fill" aria-pressed="false" title="Fill (G)"><span aria-hidden="true">▧</span><span>Fill</span></button>
+                <button class="tool-button" type="button" data-tool="eyedropper" aria-pressed="false" title="Eyedropper (I)"><span aria-hidden="true">⌁</span><span>Pick</span></button>
+              </div>
+              <span class="toolbar-separator" aria-hidden="true"></span>
+              <label class="inline-control color-control" for="paint-color"><span>Color</span><input id="paint-color" type="color" value="#f4b400"></label>
+              <label class="inline-control" for="grid-resolution"><span>Grid</span><select id="grid-resolution" disabled><option>Native</option></select></label>
+              <span class="toolbar-separator" aria-hidden="true"></span>
+              <div class="tool-group" aria-label="History">
+                <button class="icon-button" id="undo-button" type="button" aria-label="Undo" title="Undo (Ctrl+Z)" disabled>↶</button>
+                <button class="icon-button" id="redo-button" type="button" aria-label="Redo" title="Redo (Ctrl+Y)" disabled>↷</button>
+              </div>
+              <div class="zoom-cluster" aria-label="Canvas zoom">
+                <button class="icon-button" id="zoom-out" type="button" aria-label="Zoom out">−</button>
+                <output id="zoom-output" for="zoom-out zoom-in">100%</output>
+                <button class="icon-button" id="zoom-in" type="button" aria-label="Zoom in">+</button>
+              </div>
+            </div>
+
+            <div class="texture-stage" id="texture-stage">
+              <div class="editor-empty" id="texture-empty">
+                <div class="editor-empty-icon" aria-hidden="true">▦</div>
+                <strong>Select a PNG texture</strong>
+                <span>Every PNG can be opened in the generic pixel editor.</span>
+              </div>
+              <div class="canvas-scroll hidden" id="canvas-scroll" tabindex="-1">
+                <div class="canvas-frame" id="canvas-frame">
+                  <canvas id="texture-canvas" tabindex="0" aria-label="Pixel editor canvas. Use arrow keys to move the logical cursor and Enter to apply the active tool."></canvas>
+                  <div class="canvas-keyboard-cursor" id="canvas-keyboard-cursor" aria-hidden="true"></div>
+                </div>
+              </div>
+            </div>
+            <div class="editor-footbar" id="texture-footbar">
+              <span id="texture-size">No texture selected</span>
+              <span id="cursor-status">Cursor —</span>
+              <span>Nearest-neighbor preview</span>
+            </div>
+          </div>
+
+          <div class="workspace-panel hidden" id="panel-animation" role="tabpanel" aria-labelledby="tab-animation" data-panel="animation">
+            <div class="studio-grid">
+              <section class="studio-card preview-card">
+                <div class="card-heading"><div><p class="eyebrow">Preview</p><h2>Animation</h2></div><button class="button subtle small" id="animation-play" type="button">Play</button></div>
+                <div class="animation-preview"><canvas id="animation-canvas" aria-label="Animation preview"></canvas></div>
+                <div class="timeline-strip" id="frame-strip" aria-label="Animation frames"></div>
+              </section>
+              <section class="studio-card settings-card">
+                <p class="eyebrow">Minecraft metadata</p><h2>Frame settings</h2>
+                <div class="form-grid">
+                  <label class="field" for="anim-frametime"><span>Frame time <small>ticks</small></span><input id="anim-frametime" type="number" min="1" step="1" value="1"></label>
+                  <label class="check-field" for="anim-interpolate"><input id="anim-interpolate" type="checkbox"><span><strong>Interpolate frames</strong><small>Smoother transitions where supported.</small></span></label>
+                  <label class="field field-wide" for="anim-frames"><span>Frame order</span><input id="anim-frames" type="text" placeholder="0, 1, 2, 3"><small>Leave empty to use sequential frames.</small></label>
+                </div>
+                <button class="button primary" id="save-animation" type="button" disabled>Save animation metadata</button>
+              </section>
+            </div>
+          </div>
+
+          <div class="workspace-panel hidden" id="panel-model" role="tabpanel" aria-labelledby="tab-model" data-panel="model">
+            <div class="studio-grid model-grid">
+              <section class="studio-card preview-card">
+                <div class="card-heading"><div><p class="eyebrow">Preview</p><h2>Model</h2></div><span class="soft-badge">1.8.9 JSON</span></div>
+                <canvas id="model-canvas" class="model-canvas" aria-label="Isometric model preview"></canvas>
+                <p class="help-text">A lightweight geometry preview for Minecraft model elements.</p>
+              </section>
+              <section class="studio-card settings-card">
+                <p class="eyebrow">Model source</p><h2>JSON editor</h2>
+                <label class="field field-wide" for="model-json"><span>Model JSON</span><textarea id="model-json" class="code-editor" spellcheck="false" rows="18" placeholder="Select a model JSON file."></textarea></label>
+                <div class="form-actions"><button class="button secondary" id="format-model" type="button" disabled>Format JSON</button><button class="button primary" id="save-model" type="button" disabled>Save model</button></div>
+              </section>
+            </div>
+          </div>
+
+          <div class="workspace-panel hidden" id="panel-sky" role="tabpanel" aria-labelledby="tab-sky" data-panel="sky">
+            <div class="studio-grid">
+              <section class="studio-card preview-card">
+                <div class="card-heading"><div><p class="eyebrow">OptiFine / MCPatcher</p><h2>Sky preview</h2></div><span class="soft-badge">world0</span></div>
+                <div class="sky-preview" id="sky-preview"><div class="sky-sun" aria-hidden="true"></div><div class="sky-horizon" aria-hidden="true"></div></div>
+                <label class="field" for="sky-time"><span>Preview time</span><input id="sky-time" type="range" min="0" max="24000" value="6000"><output id="sky-time-output">06:00</output></label>
+              </section>
+              <section class="studio-card settings-card">
+                <p class="eyebrow">Layer properties</p><h2>Custom sky</h2>
+                <div class="form-grid">
+                  <label class="field field-wide" for="sky-source"><span>Source</span><input id="sky-source" type="text" placeholder="./sky1.png"></label>
+                  <label class="field" for="sky-fade-in"><span>Fade in</span><input id="sky-fade-in" type="text" placeholder="04:00"></label>
+                  <label class="field" for="sky-fade-out"><span>Fade out</span><input id="sky-fade-out" type="text" placeholder="19:30"></label>
+                  <label class="field" for="sky-blend"><span>Blend</span><select id="sky-blend"><option>add</option><option>alpha</option><option>screen</option><option>multiply</option><option>replace</option></select></label>
+                  <label class="field" for="sky-speed"><span>Rotation speed</span><input id="sky-speed" type="number" step="0.01" value="1"></label>
+                  <label class="check-field field-wide" for="sky-rotate"><input id="sky-rotate" type="checkbox" checked><span><strong>Rotate layer</strong><small>Uses the configured speed and axis.</small></span></label>
+                </div>
+                <button class="button primary" id="save-sky" type="button" disabled>Save sky properties</button>
+              </section>
+            </div>
+          </div>
+
+          <div class="workspace-panel hidden" id="panel-advanced" role="tabpanel" aria-labelledby="tab-advanced" data-panel="advanced">
+            <div class="advanced-layout">
+              <section class="studio-card advanced-editor-card">
+                <div class="card-heading"><div><p class="eyebrow">Direct edit</p><h2>Raw file</h2></div><span class="soft-badge" id="raw-file-type">Text</span></div>
+                <label class="visually-hidden" for="raw-editor">Raw file contents</label>
+                <textarea id="raw-editor" class="code-editor raw-editor" spellcheck="false" placeholder="Select a JSON, .mcmeta, .properties or text file."></textarea>
+                <div class="form-actions"><button class="button secondary" id="format-raw" type="button" disabled>Format JSON</button><button class="button primary" id="save-raw" type="button" disabled>Save file</button></div>
+              </section>
+              <aside class="studio-card builder-card">
+                <p class="eyebrow">Quick builder</p><h2 id="builder-title">Properties helper</h2>
+                <div id="builder-content" class="builder-content"><p class="muted">Select a CTM or CIT properties file to get structured fields.</p></div>
+              </aside>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="side-panel inspector-panel" id="inspector-panel" aria-label="Inspector">
+        <div class="panel-header">
+          <div><p class="eyebrow">Context</p><h2>Inspector</h2></div>
+          <button class="icon-button panel-close mobile-only" id="close-inspector-drawer" type="button" aria-label="Close inspector">×</button>
+        </div>
+        <div class="inspector-content">
+          <section class="inspector-section">
+            <h3>Selected asset</h3>
+            <dl class="property-list">
+              <div><dt>Type</dt><dd id="inspector-type">—</dd></div>
+              <div><dt>Path</dt><dd id="inspector-path">—</dd></div>
+              <div><dt>Size</dt><dd id="inspector-size">—</dd></div>
+            </dl>
+          </section>
+          <section class="inspector-section">
+            <h3>Project health</h3>
+            <div class="health-meter"><div class="health-meter-bar" id="health-meter-bar" style="width:100%"></div></div>
+            <div class="health-summary"><span><strong id="error-count">0</strong> errors</span><span><strong id="warning-count">0</strong> warnings</span></div>
+            <button class="button subtle full-width" id="inspector-validate" type="button" disabled>Run validation</button>
+          </section>
+          <section class="inspector-section">
+            <h3>Storage</h3>
+            <p class="muted" id="storage-summary">Local project storage is not active yet.</p>
+            <button class="button subtle full-width" id="persist-storage" type="button">Request persistent storage</button>
+          </section>
+        </div>
+      </aside>
+    </main>
+
+    <section class="problems-panel" id="problems-panel" aria-label="Problems" hidden>
+      <div class="problems-header">
+        <div><p class="eyebrow">Validator</p><h2>Problems</h2></div>
+        <button class="icon-button" id="close-problems" type="button" aria-label="Close problems panel">×</button>
+      </div>
+      <div class="problems-list" id="problems-list"><div class="empty-mini"><strong>No problems yet</strong><span>Run validation after opening a pack.</span></div></div>
+    </section>
+
+    <div class="drawer-scrim" id="drawer-scrim" hidden></div>
+  </div>
+
+  <dialog class="app-dialog" id="new-project-dialog">
+    <form method="dialog" id="new-project-form">
+      <div class="dialog-heading"><div><p class="eyebrow">New project</p><h2>Create a 1.8.9 pack</h2></div><button class="icon-button" value="cancel" aria-label="Close dialog" type="submit">×</button></div>
+      <p class="dialog-description">Start from the Minecraft Java 1.8.9 vanilla texture set or create a blank pack. Vanilla files are read locally from your own 1.8.9 client JAR and kept in this browser.</p>
+      <label class="field" for="new-project-name"><span>Project name</span><input id="new-project-name" name="name" type="text" value="My Resource Pack" required maxlength="80"></label>
+      <label class="field" for="new-project-description"><span>Pack description</span><input id="new-project-description" name="description" type="text" value="Made with MC Texture Maker" maxlength="160"></label>
+
+      <fieldset class="start-source-group">
+        <legend>Starting textures</legend>
+        <label class="source-choice" for="new-project-source-vanilla">
+          <input id="new-project-source-vanilla" type="radio" name="project-source" value="vanilla" checked>
+          <span><strong>Vanilla 1.8.9</strong><small>Show every vanilla texture from the start. Only textures you change are added to your exported pack.</small></span>
+        </label>
+        <label class="source-choice" for="new-project-source-blank">
+          <input id="new-project-source-blank" type="radio" name="project-source" value="blank">
+          <span><strong>Blank pack</strong><small>Start with pack.mcmeta only.</small></span>
+        </label>
+      </fieldset>
+
+      <section class="vanilla-library-setup" id="vanilla-library-setup" aria-labelledby="vanilla-library-title">
+        <div class="vanilla-library-copy">
+          <strong id="vanilla-library-title">Vanilla texture library</strong>
+          <span id="vanilla-library-status" role="status" aria-live="polite">Checking local library…</span>
+        </div>
+        <label class="button subtle file-button" id="vanilla-library-label" for="vanilla-library-file">Choose 1.8.9.jar</label>
+        <input id="vanilla-library-file" class="visually-hidden" type="file" accept=".jar,.zip,application/java-archive,application/zip">
+      </section>
+
+      <label class="check-field" for="new-project-optifine"><input id="new-project-optifine" name="optifine" type="checkbox" checked><span><strong>OptiFine 1.8.9 workspace</strong><small>Expose MCPatcher sky/CTM/CIT helpers.</small></span></label>
+      <div class="dialog-actions"><button class="button subtle" value="cancel" type="submit">Cancel</button><button class="button primary" id="create-project-submit" value="default" type="submit" disabled>Create project</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="app-dialog danger-dialog" id="confirm-dialog">
+    <form method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">Confirm</p><h2 id="confirm-title">Replace project?</h2></div></div>
+      <p class="dialog-description" id="confirm-message">This action may replace the current local project.</p>
+      <div class="dialog-actions"><button class="button subtle" id="confirm-cancel" value="cancel" type="submit">Cancel</button><button class="button danger" id="confirm-accept" value="confirm" type="submit">Continue</button></div>
+    </form>
+  </dialog>
+
+  <div class="drop-overlay" id="drop-overlay" aria-hidden="true"><div><strong>Drop ZIP to open resource pack</strong><span>Only .zip files are accepted. Existing local work will be confirmed before replacement.</span></div></div>
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
