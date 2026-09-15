@@ -22,7 +22,7 @@ jobs:
         run: |
           mkdir -p src /tmp/mctm-ui
           base64 -d ui-source/index.html.gz.b64 | gzip -d > index.html
-          sed 's/=$//' ui-source/styles.css.gz.b64 | base64 -d | gzip -d > styles.css
+          base64 -d ui-source/styles.css.gz.b64 | gzip -d > styles.css
           base64 -d ui-source/app-part0.gz.b64 | gzip -d > /tmp/mctm-ui/app0.js
           base64 -d ui-source/app-part1.gz.b64 | gzip -d > /tmp/mctm-ui/app1.js
           cat /tmp/mctm-ui/app0.js /tmp/mctm-ui/app1.js > src/app.js
@@ -49,6 +49,7 @@ jobs:
           node tests/zip.test.mjs
           node tests/validators.test.mjs
           node tests/ui-static.test.mjs
+          node tests/vanilla-baseline.test.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
